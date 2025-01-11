@@ -35,7 +35,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('show.login')->with('success', 'Registration successful.');
+        return redirect()->route('show.login')->with('message', [
+            'title' => 'Success!',
+            'text' => 'Registered successfully.',
+            'icon' => 'success',
+        ]);
     }
 
 
@@ -46,11 +50,17 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('dashboard');
+            return redirect()->route('dashboard')->with('message', [
+                'title' => 'Success!',
+                'text' => 'Welcome to dashboard.',
+                'icon' => 'success',
+            ]);
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+        return redirect()->route('show.login')->with('message', [
+            'title' => 'Error!',
+            'text' => 'The provided credentials do not match our records.',
+            'icon' => 'error',
         ]);
     }
 
@@ -59,9 +69,10 @@ class AuthController extends Controller
     {
         Auth::logout();
 
+        // remove session data and regenerate csrf token after logout
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('show.login');
     }
 }

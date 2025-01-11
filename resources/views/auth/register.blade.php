@@ -20,7 +20,7 @@
                 <div class="col-lg-8">
                     <h2 class="fw-bold mb-5">Sign up now</h2>
                     @if( $errors->any() )
-                    <ul class="list-group">
+                    <ul class="list-group m-3">
                         @foreach( $errors->all() as $error )
                         <li class="list-group-item list-group-item-danger">{{ $error }}</li>
                         @endforeach
