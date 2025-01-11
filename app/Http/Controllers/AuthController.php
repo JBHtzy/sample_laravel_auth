@@ -50,16 +50,18 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
             return redirect()->route('dashboard')->with('message', [
                 'title' => 'Success!',
-                'text' => 'Welcome to dashboard.',
+                'text' => 'Welcome to dashboard' . ' ' . $user->name,
                 'icon' => 'success',
             ]);
         }
 
         return redirect()->route('show.login')->with('message', [
             'title' => 'Error!',
-            'text' => 'The provided credentials do not match our records.',
+            'text' => 'The provided credentials not exist.',
             'icon' => 'error',
         ]);
     }
