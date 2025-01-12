@@ -9,20 +9,22 @@
                     class="img-fluid" alt="Sample image">
             </div>
             <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+
                 <form action="{{ route('login') }}" method="POST">
                     @csrf
                     <!-- Email input -->
                     <div data-mdb-input-init class="form-outline mb-4">
                         <label class="form-label" for="form3Example3">Email Address</label>
-                        <input type="email" name="email" id="form3Example3" class="form-control form-control-lg"
-                            placeholder="Enter a valid email address" />
+                        <input type="email" name="email" id="form3Example3" class="form-control form-control-lg" autofocus />
+                        <span @if ($errors->has('email')) class="text-danger mt-2" @endif>{{ $errors->first('email') }}</span>
+
                     </div>
 
                     <!-- Password input -->
                     <div data-mdb-input-init class="form-outline mb-3">
                         <label class="form-label" for="form3Example4">Password</label>
-                        <input type="password" name="password" id="form3Example4" class="form-control form-control-lg"
-                            placeholder="Enter password" />
+                        <input type="password" name="password" id="form3Example4" class="form-control form-control-lg" />
+                        <span @if ($errors->has('password')) class="text-danger mt-2" @endif>{{ $errors->first('password') }}</span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
