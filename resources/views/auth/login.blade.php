@@ -27,6 +27,9 @@
                         <span @if ($errors->has('password')) class="text-danger mt-2" @endif>{{ $errors->first('password') }}</span>
                     </div>
 
+                    <!-- Google Recaptcha Widget-->
+                    <div class="g-recaptcha mt-4" data-sitekey={{config('services.recaptcha.key')}}></div>
+
                     <div class="d-flex justify-content-between align-items-center">
                         <!-- Checkbox -->
                         <div class="form-check mb-0">

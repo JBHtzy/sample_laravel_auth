@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class AuthController extends Controller
 {
@@ -45,17 +48,47 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
+
         $credentials = $request->validated();
+        $recaptcha_response = $request->input('g-recaptcha-response');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        if (is_null($recaptcha_response)) {
+            return redirect()->back()->with('message', [
+                'title' => 'Are you a robot?',
+                'text' => 'Please Complete the Recaptcha to proceed',
+                'icon' => 'info',
+            ]);
+        }
 
-            $user = Auth::user();
+        $url = "https://www.google.com/recaptcha/api/siteverify";
+        $body = [
+            'secret' => config('services.recaptcha.secret'),
+            'response' => $recaptcha_response,
+            'remoteip' => IpUtils::anonymize($request->ip())
+        ];
 
-            return redirect()->route('dashboard')->with('message', [
-                'title' => 'Success!',
-                'text' => 'Welcome to dashboard' . ' ' . $user->name,
-                'icon' => 'success',
+        $response = Http::asForm()->post($url, $body);
+
+        $result = json_decode($response);
+
+        if ($response->successful() && $result->success == true) {
+            // dd($result);
+
+            if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
+                $user = Auth::user();
+
+                return redirect()->route('dashboard')->with('message', [
+                    'title' => 'Success!',
+                    'text' => 'Welcome to dashboard' . ' ' . $user->name,
+                    'icon' => 'success',
+                ]);
+            }
+        } else {
+            return redirect()->back()->with('message', [
+                'title' => 'Warn!',
+                'text' => 'Please Complete the Recaptcha Again to proceed',
+                'icon' => 'warning',
             ]);
         }
 
